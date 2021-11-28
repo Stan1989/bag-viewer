@@ -1,53 +1,43 @@
-const electron = require('electron');
-const {app, BrowserWindow} = require('electron');
-const path = require('path');
-const url = require('url');
-
-let mainWindow;
+const { app, BrowserWindow, ipcMain, nativeTheme } = require('electron')
+const path = require('path')
 
 function createWindow () {
-    var ico = path.join(__dirname, 'res', 'logo.png');
-    // Create the browser window.
-    mainWindow = new BrowserWindow({
-        width: 1024, 
-        height: 640,
-        transparent: false,
-        frame: true,
-        icon: ico, 
-        resizable : true //固定大小
-    });
+  const win = new BrowserWindow({
+    width: 800,
+    height: 600,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js')
+    }
+  })
 
-    const URL = url.format({
-        pathname: path.join(__dirname, 'index.html'),
-        protocol: 'file:',
-        slashes: true
-      })
+  win.loadFile('index.html')
 
-    mainWindow.loadURL(URL);
-    console.log(URL);
-    mainWindow.openDevTools()
+  ipcMain.handle('dark-mode:toggle', () => {
+    if (nativeTheme.shouldUseDarkColors) {
+      nativeTheme.themeSource = 'light'
+    } else {
+      nativeTheme.themeSource = 'dark'
+    }
+    return nativeTheme.shouldUseDarkColors
+  })
 
-    mainWindow.on('closed', function () {
-      mainWindow = null;
-    });
-
+  ipcMain.handle('dark-mode:system', () => {
+    nativeTheme.themeSource = 'system'
+  })
 }
 
-app.on('ready', createWindow);
+app.whenReady().then(() => {
+  createWindow()
 
-// Quit when all windows are closed.
-app.on('window-all-closed', function () {
-  // On OS X it is common for applications and their menu bar
-  // to stay active until the user quits explicitly with Cmd + Q
+  app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) {
+      createWindow()
+    }
+  })
+})
+
+app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
-    app.quit();
+    app.quit()
   }
-});
-
-app.on('activate', function () {
-  // On OS X it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
-  if (mainWindow === null) {
-    createWindow();
-  }
-});
+})
