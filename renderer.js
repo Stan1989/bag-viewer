@@ -13,7 +13,8 @@ var titlebar;
 var normalMenu;
 
 var sidebarWidth = 75;
-
+var queryNodes = [{name: "null", sql: "null", count_sql: "null"}]
+var listDisplayNodes = []
 function init() {
 
     contextMenu({
@@ -129,7 +130,9 @@ function init() {
         }, false);
     });
 
-    //loadUITree();
+    UIDB.initQueryFromUIDB(path.join(__dirname, "bag_viewer_ui.db"), queryNodes)
+    UIDB.initListDisplayFromUIDB(path.join(__dirname, "bag_viewer_ui.db"), listDisplayNodes)
+    loadUITree();
 
     var table = $('#table_id').DataTable();
 
@@ -260,7 +263,7 @@ function openAboutPage() {
 
 function buildTreeData(curNode, data) {
     data.child.forEach(item => {
-        var subNode = { name: item.name, param: item.param, children: [] }
+        var subNode = { name: item.name, param: item.param, query_id: item.query_id, record_id : item.record_id, children: [] }
         if (item.child) {
             buildTreeData(subNode, item);
         }
@@ -268,9 +271,12 @@ function buildTreeData(curNode, data) {
     });
 }
 
-function loadUIRecord(column, param) {
-    UIDB.loadUIRecord(path.join(__dirname, "bag_viewer_ui.db"), column, param, function (data) {
+function loadUIRecord(sql, listDisplayName) {
+    UIDB.loadUIRecord(path.join(__dirname, "data.db"), sql, function (data) {
         var t = $('#table_id').DataTable();
+        listDisplayName.forEach(element => {
+
+        });
         t.clear().draw();
         data.forEach(element => {
             t.row.add([element.title, element.country, element.category, element.introduction, '']).draw(false);
@@ -296,9 +302,26 @@ function loadUITree() {
         })
 
         tree.on('selected', item => {
-
-            loadUIRecord("category", item.param);
-            console.log('item selected')
+           
+            var debug_log = "query_id = " + item.query_id + "; param = " + item.param
+           
+            queryNodes.forEach(item2 => {debug_log += item2.sql})
+            $("#debug_log").text(debug_log);
+            if(item.query_id > 0) {
+                var index = item.query_id
+                debug_log += "ttttttt"
+                $("#debug_log").text(debug_log);
+                debug_log += "..........." + queryNodes[index].sql
+                $("#debug_log").text(debug_log);
+                var sql = queryNodes[index].sql + " WHERE " + item.param
+                debug_log += "; sql = " + sql
+                $("#debug_log").text(debug_log);
+                console.log(sql);
+    
+                loadUIRecord(sql, listDisplayNodes[item.record_id]);
+                console.log('item selected')
+            }
+           
         })
     });
 }

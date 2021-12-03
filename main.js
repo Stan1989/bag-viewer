@@ -127,22 +127,27 @@ function createWindow() {
     mainWindow.loadFile('index.html')
 }
 
-const PythonShell = require('python-shell').PythonShell;
-function syncData() {
+// const PythonShell = require('python-shell').PythonShell;
+// function syncData() {
     
-    var pyshell = new PythonShell('script/sync.py');
+//     var pyshell = new PythonShell('script/sync.py');
     
-    pyshell.on('message', function (message) {
-        // received a message sent from the Python script (a simple "print" statement)
-        console.log(message);
-    });
-    // end the input stream and allow the process to exit
-    pyshell.end(function (err, code, signal) {
-        if (err) throw err;
-        console.log('The exit code was: ' + code);
-        console.log('The exit signal was: ' + signal);
-        console.log('finished');
-    });
-}
+//     pyshell.on('message', function (message) {
+//         // received a message sent from the Python script (a simple "print" statement)
+//         console.log(message);
+//     });
+//     // end the input stream and allow the process to exit
+//     pyshell.end(function (err, code, signal) {
+//         if (err) throw err;
+//         console.log('The exit code was: ' + code);
+//         console.log('The exit signal was: ' + signal);
+//         console.log('finished');
+//     });
+// }
 
-syncData();
+//syncData();
+
+//var queryNodes = {};
+//var listDisplayNodes = {};
+//UIDB.initQueryFromUIDB(path.join(__dirname, "bag_viewer_ui.db"), queryNodes);
+//UIDB.initListDisplayFromUIDB(path.join(__dirname, "bag_viewer_ui.db"), listDisplayNodes);

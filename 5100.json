@@ -3,7 +3,7 @@
     "templateName": "PF5100 Reader",
     "query" :[
         {
-            "ID" : 22,
+            "ID" : 4,
             "name" : "query account info",
             "querySQL" : "SELECT source, usrname, name, displayname, password, email, mobile, sex, address, token FROM userinfo",
             "queryCountSQL": "",
