@@ -1,0 +1,87 @@
+{
+    "version": 1.0,
+    "templateName": "PF5100 Reader",
+    "query" :[
+        {
+            "ID" : 22,
+            "name" : "query account info",
+            "querySQL" : "SELECT source, usrname, name, displayname, password, email, mobile, sex, address, token FROM userinfo",
+            "queryCountSQL": "",
+            "listDisplayFmt": {
+                "column": [
+                    {
+                        "queryName" : "",
+                        "DisplayName": "序号",
+                        "DisplayNameEn": "Order",
+                        "Width":  60,
+                        "supportOrder": 1
+                    },
+                    {
+                        "queryName" : "source",
+                        "DisplayName": "应用",
+                        "DisplayNameEn": "Application",
+                        "Width":  120,
+                        "supportOrder": 1
+                    },
+                    {
+                        "queryName" : "usrname",
+                        "DisplayName": "账号",
+                        "DisplayNameEn": "account",
+                        "Width":  200,
+                        "supportOrder": 1
+                    },
+                    {
+                        "queryName" : "name",
+                        "DisplayName": "账号名",
+                        "DisplayNameEn": "account name",
+                        "Width":  160,
+                        "supportOrder": 1
+                    },
+                    {
+                        "queryName" : "displayname",
+                        "DisplayName": "显示名",
+                        "DisplayNameEn": "displayname",
+                        "Width":  160,
+                        "supportOrder": 1
+                    },
+                    {
+                        "queryName" : "password",
+                        "DisplayName": "密码",
+                        "DisplayNameEn": "password",
+                        "Width":  100,
+                        "supportOrder": 1
+                    },
+                    {
+                        "queryName" : "email",
+                        "DisplayName": "邮箱",
+                        "DisplayNameEn": "email",
+                        "Width":  160,
+                        "supportOrder": 1
+                    },
+                    {
+                        "queryName" : "mobile",
+                        "DisplayName": "手机",
+                        "DisplayNameEn": "phone number",
+                        "Width":  120,
+                        "supportOrder": 1
+                    },
+                    {
+                        "queryName" : "sex",
+                        "DisplayName": "性别",
+                        "DisplayNameEn": "gender",
+                        "Width":  50,
+                        "supportOrder": 1
+                    },
+                    {
+                        "queryName" : "address",
+                        "DisplayName": "地址",
+                        "DisplayNameEn": "address",
+                        "Width":  100,
+                        "supportOrder": 1
+                    }
+                ]
+
+            }
+        }
+    ]
+}

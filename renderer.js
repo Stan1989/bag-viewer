@@ -129,7 +129,7 @@ function init() {
         }, false);
     });
 
-    loadUITree();
+    //loadUITree();
 
     var table = $('#table_id').DataTable();
 
