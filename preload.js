@@ -1,6 +1,10 @@
 const { contextBridge, ipcRenderer } = require('electron')
+const path = require('path')
 
-contextBridge.exposeInMainWorld('darkMode', {
-  toggle: () => ipcRenderer.invoke('dark-mode:toggle'),
-  system: () => ipcRenderer.invoke('dark-mode:system')
+contextBridge.exposeInMainWorld('electron', {
+  startDrag: (fileName) => {
+    ipcRenderer.send('ondragstart', fileName)
+  }
 })
+
+contextBridge.exposeInMainWorld('myAPI', "123")

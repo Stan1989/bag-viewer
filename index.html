@@ -1,19 +1,182 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en" style="height: 100%">
+
 <head>
-    <meta charset="UTF-8">
-    <title>Hello World!</title>
-    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
-    <link rel="stylesheet" type="text/css" href="./styles.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>BCPViewer</title>
+
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="css/styles.css">
+
+
+    <script src="node_modules/jquery/dist/jquery.min.js"></script>
+    <script>
+        window.jQuery = window.$ = require('jquery');
+    </script>
+    <script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="node_modules/feather-icons/dist/feather.min.js"></script>
+    <script src="node_modules/datatables.net/js/jquery.dataTables.js"></script>
+
+    <!-- HIGHLIHTJS STYLES -->
+    <link id="codeStyleLink" rel="stylesheet" href="node_modules/highlight.js/styles/atom-one-dark.css">
+    <!-- HIGHLIHTJS STYLES -->
+    <link id="codeOverlayLink" rel="stylesheet">
+    <link rel="stylesheet" href="node_modules/electron-tree-view/style.css" />
+    <link rel="stylesheet" href="node_modules/datatables.net-dt/css/jquery.dataTables.css">
 </head>
-<body>
-    <h1>Hello World!</h1>
-    <p>Current theme source: <strong id="theme-source">System</strong></p>
 
-    <button id="toggle-dark-mode">Toggle Dark Mode</button>
-    <button id="reset-to-system">Reset to System Theme</button>
 
+<body style="height: 100%">
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- SIDEBAR -->
+            <nav id="sidebarMenu" class="d-md-block bg-light sidebar shadow">
+                <div class="sidebar-sticky pt-3">
+                    <ul class="nav flex-column unselectable">
+                        <li class="nav-item my-sidebar-item">
+                            <a id="homeTab" class="nav-link my-sidebar-link active" href="#" draggable="false"
+                                onclick="showHomePage()">
+                                <span data-feather="home"></span>
+                            </a>
+                        </li>
+                        <li class="nav-item my-sidebar-item">
+                            <a id="settingsTab" class="nav-link my-sidebar-link" href="#" draggable="false"
+                                onclick="showSettingsPage()">
+                                <span data-feather="settings"></span>
+                            </a>
+                        </li>
+                        <span id="sidebarResizer" class="unselectable"></span>
+                </div>
+            </nav>
+
+            <span id="sidebarToggler" class="unselectable" data-feather="chevrons-left" onclick="toggleSidebar()"
+                title="Toggle Sidebar"></span>
+
+
+
+            <!-- MAIN CONTAINER -->
+            <main id="mainContainer" role="main" class="p-0">
+                <!-- HOME PAGE -->
+                <span id="homePage" style="display:block; height: 100%" class="unselectable">
+    
+                    <div class="container-fluid">
+                        <div class="row align-items-start">
+                            <div class="col">
+                                One of three columns
+                            </div>
+                            <div class="col">
+                                One of three columns
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-2">
+                                <div id="ui_tree"></div>
+                            </div>
+                            <div class="col-lg-10">
+                                <div class="row align-items-start">
+                                    <table id="table_id" class="display">
+                                        <thead>
+                                            <tr>
+                                                <th>title</th>
+                                                <th>country</th>
+                                                <th>category</th>
+                                                <th>introduction</th>
+                                                <th>preview</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="row align-items-end">
+                                    <span id="eventContent"></span>
+
+                                    <img id="attachmentView" src="" />
+                                </div>
+
+
+                                <div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </span>
+
+                <!-- HELP PAGE -->
+                <span id="helpPage" style="display:none">
+                    <div class="content shadow-sm" id="helpContent">
+
+                    </div>
+                </span>
+
+                <!-- SETTINGS PAGE -->
+                <span id="settingsPage" class="unselectable" style="display: none;">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-lg-2">
+                                <a href="#" id="cloudSync" class="nav-link my-sidebar-link indent unselectable"
+                                    onclick="syncData();">
+                                    <span data-feather="upload-cloud"></span><span class="page-title"> Cloud syncing
+                                    </span>
+                                </a>
+                            </div>
+                            <div class="col-lg-10">
+                            </div>
+
+                        </div>
+                    </div>
+
+                </span>
+
+                <!-- EDITOR PAGE -->
+                <span id="editorPage" style="display: none;">
+                    <!-- EDITOR RIBBON -->
+                    <nav id="editorRibbon" class="navbar navbar-expand-sm navbar-light shadow">
+                    </nav>
+
+                    <div class="content shadow-sm" id="editorContent">
+                        <div id="editor" spellcheck="true" tab-index="0"></div>
+                    </div>
+
+
+                </span>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- NEW NOTEBOOK MODAL -->
+    <div class="modal fade unselectable" id="openBCPModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content shadow-lg">
+                <form id="openBCPForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title">open a BCP package</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="file" id="bcpFolder" webkitdirectory multiple />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="mybtn" data-dismiss="modal">Cancel</button>
+                        <input type="submit" class="mybtn-primary" id="openBCPButton" value="Open">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+
+        });
+    </script>
     <script src="renderer.js"></script>
-  </body>
 </body>
+
 </html>
