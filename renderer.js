@@ -13,15 +13,12 @@ var titlebar;
 var normalMenu;
 
 var sidebarWidth = 75;
-var queryNodes = [{name: "null", sql: "null", count_sql: "null"}]
-var listDisplayNodes = []
+var listDisplayNodes = {1: []}
 function init() {
-
     contextMenu({
         showSearchWithGoogle: false,
         showLookUpSelection: false
     });
-
 
     if (remote.process.platform === 'win32') {
         titlebar = new customTitlebar.Titlebar({
@@ -29,8 +26,6 @@ function init() {
             unfocusEffect: true,
             icon: './res/logo.png'
         });
-
-
         document.getElementById('editorRibbon').style.marginTop = "40px";
     }
 
@@ -129,11 +124,8 @@ function init() {
             window.removeEventListener('mousemove', handleSidebarResizerDrag, false);
         }, false);
     });
-
-    UIDB.initQueryFromUIDB(path.join(__dirname, "bag_viewer_ui.db"), queryNodes)
-    UIDB.initListDisplayFromUIDB(path.join(__dirname, "bag_viewer_ui.db"), listDisplayNodes)
     loadUITree();
-
+    loadListRecordDefines();
     var table = $('#table_id').DataTable();
 
     table.on('click', 'tbody tr', function () {
@@ -148,8 +140,6 @@ init();
 
 
 function applyModalEventHandlers() {
-
-    /*OPEN BCP MODAL */
     document.getElementById('openBCPForm').addEventListener('submit', (e) => {
         e.preventDefault();
         pickPath = document.getElementById("bcpFolder").value;
@@ -261,67 +251,60 @@ function openAboutPage() {
     about.loadFile('about.html');
 }
 
-function buildTreeData(curNode, data) {
-    data.child.forEach(item => {
-        var subNode = { name: item.name, param: item.param, query_id: item.query_id, record_id : item.record_id, children: [] }
-        if (item.child) {
-            buildTreeData(subNode, item);
-        }
-        curNode.children.push(subNode)
+
+function loadListRecordDefines() {
+    UIDB.loadListRecordDefines(path.join(__dirname, "bag_viewer_ui.db"), listDisplayNodes, function () {
+      
     });
 }
 
-function loadUIRecord(sql, listDisplayName) {
-    UIDB.loadUIRecord(path.join(__dirname, "data.db"), sql, function (data) {
+function loadUIRecord(sql, columns) {
+    UIDB.loadUIRecord(path.join(__dirname, "data.db"), sql, function (records) {
         var t = $('#table_id').DataTable();
-        listDisplayName.forEach(element => {
-
-        });
-        t.clear().draw();
-        data.forEach(element => {
-            t.row.add([element.title, element.country, element.category, element.introduction, '']).draw(false);
-        });
-
-
+        t.destroy(); 
+        $('#table_id').empty();
+        var table = "<thead>\n<tr> \n";
+        columns.forEach(col =>{
+            table += "<th>" + col.display_name + "</th>"
+        }); 
+        table += "</tr>\n</thead>"; 
+       
+        $('#table_id').append(table); 
+        var t2 = $('#table_id').DataTable();
+        for (var i = 0; i < records.length; i++) {
+            var item = []
+             columns.forEach(col => {
+                 if(col.query_name.length == 0) {
+                    item.push(i);
+                 }
+                 else {
+                    item.push(records[i][col.query_name]);
+                 }
+                
+            });
+            t2.row.add(item).draw(false);
+        }
     });
 }
 
 function loadUITree() {
-    UIDB.loadUITree(path.join(__dirname, "bag_viewer_ui.db"), function (data) {
-        var root = {
-            name: data[0].name,
-            children: []
-        };
-
-        buildTreeData(root, data[0]);
+    UIDB.loadUITree(path.join(__dirname, "bag_viewer_ui.db"), function (root) {
         const tree = require('electron-tree-view')({
             root,
             container: document.querySelector('#ui_tree'),
             children: c => c.children,
-            label: c => c.name
+            label: c => c.display_name
         })
-
         tree.on('selected', item => {
-           
-            var debug_log = "query_id = " + item.query_id + "; param = " + item.param
-           
-            queryNodes.forEach(item2 => {debug_log += item2.sql})
-            $("#debug_log").text(debug_log);
-            if(item.query_id > 0) {
-                var index = item.query_id
-                debug_log += "ttttttt"
-                $("#debug_log").text(debug_log);
-                debug_log += "..........." + queryNodes[index].sql
-                $("#debug_log").text(debug_log);
-                var sql = queryNodes[index].sql + " WHERE " + item.param
-                debug_log += "; sql = " + sql
+            if(item.query_id > 0 && item.record_id > 0) {
+                var sql = item.base_sql + " WHERE " + item.query_condition
+                var debug_log = "click tree. sql = " + sql
                 $("#debug_log").text(debug_log);
                 console.log(sql);
-    
                 loadUIRecord(sql, listDisplayNodes[item.record_id]);
-                console.log('item selected')
             }
-           
+            
+            console.log('item selected')
         })
     });
 }

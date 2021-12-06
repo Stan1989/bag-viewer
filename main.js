@@ -151,3 +151,12 @@ function createWindow() {
 //var listDisplayNodes = {};
 //UIDB.initQueryFromUIDB(path.join(__dirname, "bag_viewer_ui.db"), queryNodes);
 //UIDB.initListDisplayFromUIDB(path.join(__dirname, "bag_viewer_ui.db"), listDisplayNodes);
+
+//UIDB.loadUITree(path.join(__dirname, "bag_viewer_ui.db"), function (root) {
+   
+//})
+var listDisplayNodes = {1 : []}
+
+UIDB.loadListRecordDefines(path.join(__dirname, "bag_viewer_ui.db"), listDisplayNodes, function () {
+      
+});
